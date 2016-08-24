@@ -1,0 +1,57 @@
+From cd250937985e1a5181880c333ed279df12553959 Mon Sep 17 00:00:00 2001
+From: Damien Tournoud <damien@platform.sh>
+Date: Wed, 24 Aug 2016 01:43:09 +0200
+Subject: Cache CSS output in Magento\Framework\Css\PreProcessor\Adapter\Less
+
+---
+ .../Css/PreProcessor/Adapter/Less/Processor.php      | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/Css/PreProcessor/Adapter/Less/Processor.php b/Css/PreProcessor/Adapter/Less/Processor.php
+index 6387ac4..bd9bae3 100644
+--- a/Css/PreProcessor/Adapter/Less/Processor.php
++++ b/Css/PreProcessor/Adapter/Less/Processor.php
+@@ -67,6 +67,17 @@ class Processor implements ContentProcessorInterface
+     {
+         $path = $asset->getPath();
+         try {
++            $content = $this->assetSource->getContent($asset);
++            if (trim($content) === '') {
++                return '';
++            }
++
++            $cacheDir = '/tmp/lesscache2';
++            $cacheFile = $cacheDir . '/' . sha1($content);
++            if (file_exists($cacheFile)) {
++              return file_get_contents($cacheFile);
++            }
++
+             $parser = new \Less_Parser(
+                 [
+                     'relativeUrls' => false,
+@@ -74,12 +85,6 @@ class Processor implements ContentProcessorInterface
+                 ]
+             );
+ 
+-            $content = $this->assetSource->getContent($asset);
+-
+-            if (trim($content) === '') {
+-                return '';
+-            }
+-
+             $tmpFilePath = $this->temporaryFile->createFile($path, $content);
+             $parser->parseFile($tmpFilePath, '');
+ 
+@@ -92,6 +97,9 @@ class Processor implements ContentProcessorInterface
+                 throw new ContentProcessorException(new Phrase($errorMessage));
+             }
+ 
++            @mkdir($cacheDir);
++            file_put_contents($cacheFile, $content);
++
+             return $content;
+         } catch (\Exception $e) {
+             $errorMessage = PHP_EOL . self::ERROR_MESSAGE_PREFIX . PHP_EOL . $path . PHP_EOL . $e->getMessage();
+-- 
+2.9.3
+

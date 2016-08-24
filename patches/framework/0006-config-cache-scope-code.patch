@@ -1,0 +1,46 @@
+commit 3fa0b67c4c4d4aad581d1e9ca419d1339cfebd95
+Author: Damien Tournoud <damien@platform.sh>
+Date:   Tue Aug 23 21:29:27 2016 +0200
+
+    Cache the resolved scope code
+
+diff --git a/App/Config/ScopePool.php b/App/Config/ScopePool.php
+index d366349..9f7b30c 100644
+--- a/App/Config/ScopePool.php
++++ b/App/Config/ScopePool.php
+@@ -40,6 +40,11 @@ class ScopePool
+     protected $_scopes = [];
+ 
+     /**
++     * @var string[]
++     */
++    protected $_scopeCodes = [];
++
++    /**
+      * @var \Magento\Framework\App\ScopeResolverPool
+      */
+     protected $_scopeResolverPool;
+@@ -126,6 +131,7 @@ class ScopePool
+     public function clean()
+     {
+         $this->_scopes = [];
++        $this->_scopeCodes = [];
+         $this->_cache->clean(\Zend_Cache::CLEANING_MODE_MATCHING_TAG, [self::CACHE_TAG]);
+     }
+ 
+@@ -141,8 +147,14 @@ class ScopePool
+         if (($scopeCode === null || is_numeric($scopeCode))
+             && $scopeType !== ScopeConfigInterface::SCOPE_TYPE_DEFAULT
+         ) {
++          if (!isset($this->_scopeCodes[$scopeType])) {
++            $this->_scopeCodes[$scopeType] = [];
++          }
++          if (!array_key_exists($scopeCode, $this->_scopeCodes[$scopeType])) {
+             $scopeResolver = $this->_scopeResolverPool->get($scopeType);
+-            $scopeCode = $scopeResolver->getScope($scopeCode);
++            $this->_scopeCodes[$scopeType][$scopeCode] = $scopeResolver->getScope($scopeCode);
++          }
++          $scopeCode = $this->_scopeCodes[$scopeType][$scopeCode];
+         }
+ 
+         if ($scopeCode instanceof \Magento\Framework\App\ScopeInterface) {

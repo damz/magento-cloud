@@ -1,0 +1,34 @@
+diff --git a/Model/Theme/Collection.php b/Model/Theme/Collection.php
+index 95d30a7..17c7127 100644
+--- a/Model/Theme/Collection.php
++++ b/Model/Theme/Collection.php
+@@ -73,6 +73,11 @@ class Collection extends \Magento\Framework\Data\Collection implements ListInter
+     private $dirReadFactory;
+ 
+     /**
++     * Cache of ThemeInterface per full path.
++     */
++    private $themeByFullPathCache = [];
++
++    /**
+      * Constructor
+      *
+      * @param \Magento\Framework\Data\Collection\EntityFactory $entityFactory
+@@ -353,10 +358,13 @@ class Collection extends \Magento\Framework\Data\Collection implements ListInter
+      */
+     public function getThemeByFullPath($fullPath)
+     {
+-        list($area, $themePath) = explode('/', $fullPath, 2);
+-        $this->addConstraint(self::CONSTRAINT_AREA, $area);
+-        $this->addFilter('theme_path', $themePath);
++        if (!isset($this->themeByFullPathCache[$fullPath])) {
++          list($area, $themePath) = explode('/', $fullPath, 2);
++          $this->addConstraint(self::CONSTRAINT_AREA, $area);
++          $this->addFilter('theme_path', $themePath);
+ 
+-        return $this->getFirstItem();
++          $this->themeByFullPathCache[$fullPath] = $this->getFirstItem();
++        }
++        return $this->themeByFullPathCache[$fullPath];
+     }
+ }

@@ -1,0 +1,39 @@
+From 8296e65c2f665542b54c93bd3ae892ccd948f3af Mon Sep 17 00:00:00 2001
+From: Damien Tournoud <damien@platform.sh>
+Date: Wed, 24 Aug 2016 01:45:46 +0200
+Subject: Magento\Framework\View\Asset\Source: Only run preprocessing once per
+ asset
+
+TODO: This is currently a massive interface violation.
+  Find a better way to do that.
+---
+ View/Asset/Source.php | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/View/Asset/Source.php b/View/Asset/Source.php
+index a2dced1..10f1cd5 100644
+--- a/View/Asset/Source.php
++++ b/View/Asset/Source.php
+@@ -132,6 +132,10 @@ class Source
+      */
+     private function preProcess(LocalInterface $asset)
+     {
++        if (isset($asset->preProcessResult)) {
++          return $asset->preProcessResult;
++        }
++
+         $sourceFile = $this->findSourceFile($asset);
+         $dir = $this->rootDir->getAbsolutePath();
+         $path = '';
+@@ -153,6 +157,8 @@ class Source
+         } else {
+             $result = [$dir, $path];
+         }
++
++        $asset->preProcessResult = $result;
+         return $result;
+     }
+ 
+-- 
+2.9.3
+

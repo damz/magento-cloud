@@ -1,0 +1,40 @@
+From 9df9fd13e4200aec6c393e726f1e3f318a2acff6 Mon Sep 17 00:00:00 2001
+From: Damien Tournoud <damien@platform.sh>
+Date: Wed, 24 Aug 2016 01:45:21 +0200
+Subject: Magento\Framework\View\Asset\Minification: Cache the isEnabled flag
+
+---
+ View/Asset/Minification.php | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/View/Asset/Minification.php b/View/Asset/Minification.php
+index 255c969..4f5b6ee 100644
+--- a/View/Asset/Minification.php
++++ b/View/Asset/Minification.php
+@@ -54,12 +54,17 @@ class Minification
+      */
+     public function isEnabled($contentType)
+     {
+-        return
+-            $this->appState->getMode() != State::MODE_DEVELOPER &&
+-            (bool)$this->scopeConfig->isSetFlag(
+-                sprintf(self::XML_PATH_MINIFICATION_ENABLED, $contentType),
+-                $this->scope
+-            );
++        if ($this->appState->getMode() == State::MODE_DEVELOPER) {
++          return false;
++        }
++
++        if (!isset($this->enabledForContentType[$contentType])) {
++          $this->enabledForContentType[$contentType] = (bool)$this->scopeConfig->isSetFlag(
++              sprintf(self::XML_PATH_MINIFICATION_ENABLED, $contentType),
++              $this->scope
++          );
++        }
++        return $this->enabledForContentType[$contentType];
+     }
+ 
+     /**
+-- 
+2.9.3
+

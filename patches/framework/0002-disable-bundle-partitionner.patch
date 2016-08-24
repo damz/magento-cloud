@@ -1,0 +1,22 @@
+From 652fc40fe4558f5eefdedbde07cc7be3b822e08e Mon Sep 17 00:00:00 2001
+From: Damien Tournoud <damien@platform.sh>
+Date: Wed, 24 Aug 2016 01:43:56 +0200
+Subject: Magento\Framework\View\Asset\Bundle: The bundle partitioner is
+ hopelessly inefficient, disable it
+
+diff --git a/View/Asset/Bundle.php b/View/Asset/Bundle.php
+index 002382c..76578ec 100644
+--- a/View/Asset/Bundle.php
++++ b/View/Asset/Bundle.php
+@@ -143,7 +143,7 @@ class Bundle
+      */
+     protected function getMaxPartSize(LocalInterface $asset)
+     {
+-        return $this->bundleConfig->getPartSize($asset->getContext());
++        return 0; // $this->bundleConfig->getPartSize($asset->getContext());
+     }
+ 
+     /**
+-- 
+2.9.3
+

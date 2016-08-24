@@ -17,7 +17,8 @@
         "magento/magento-cloud-metapackage": "2.1.0",
         "composer/composer": "@alpha",
         "colinmollenhour/credis": "1.6",
-        "colinmollenhour/php-redis-session-abstract": "1.1"
+        "colinmollenhour/php-redis-session-abstract": "1.1",
+        "cweagans/composer-patches": "~1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "4.1.0",
@@ -56,6 +57,19 @@
     "minimum-stability": "alpha",
     "prefer-stable": true,
     "extra": {
-        "magento-force": "override"
+        "magento-force": "override",
+        "patches": {
+            "magento/framework": {
+              "patches/framework/0001-cache-less-output.patch": "patches/framework/0001-cache-less-output.patch",
+              "patches/framework/0002-disable-bundle-partitionner.patch": "patches/framework/0002-disable-bundle-partitionner.patch",
+              "patches/framework/0003-bundle-maximum-part-bytes.patch": "patches/framework/0003-bundle-maximum-part-bytes.patch",
+              "patches/framework/0004-asset-cache-minification-flag.patch": "patches/framework/0004-asset-cache-minification-flag.patch",
+              "patches/framework/0005-asset-cache-preprocess.patch": "patches/framework/0005-asset-cache-preprocess.patch",
+              "patches/framework/0006-config-cache-scope-code.patch": "patches/framework/0006-config-cache-scope-code.patch"
+            },
+            "magento/module-theme": {
+              "patches/module-theme/0001-theme-fullpath-cache.patch": "patches/module-theme/0001-theme-fullpath-cache.patch"
+            }
+          }
     }
 }

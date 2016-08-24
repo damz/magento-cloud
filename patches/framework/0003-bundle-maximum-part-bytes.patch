@@ -1,0 +1,28 @@
+From b21096aa1d00985e1546b6be156ce7504d54a58b Mon Sep 17 00:00:00 2001
+From: Damien Tournoud <damien@platform.sh>
+Date: Wed, 24 Aug 2016 01:44:19 +0200
+Subject: Magento\Framework\View\Asset\Bundle: The maximum part size is in
+ bytes, not UTF8 runes
+
+As a nice side effect, avoid calling mb_strlen() which is
+*really* slow.
+---
+ View/Asset/Bundle.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/View/Asset/Bundle.php b/View/Asset/Bundle.php
+index 76578ec..a68bbfe 100644
+--- a/View/Asset/Bundle.php
++++ b/View/Asset/Bundle.php
+@@ -156,7 +156,7 @@ class Bundle
+     protected function getSizePartWithNewAsset(LocalInterface $asset, $assets = [])
+     {
+         $assets[$this->getAssetKey($asset)] = $asset;
+-        return mb_strlen($this->getPartContent($assets), 'utf-8') / 1024;
++        return strlen($this->getPartContent($assets)) / 1024;
+     }
+ 
+     /**
+-- 
+2.9.3
+
